@@ -10,6 +10,21 @@ tasks = []
 def get_tasks():
     return jsonify(tasks)
 
+@app.route('/tasks/<int:index>', methods=['DELETE'])
+def delete_task(index):
+    if 0 <= index < len(tasks):
+        tasks.pop(index)
+        return jsonify({"message": "Silindi"}), 200
+    return jsonify({"error": "Geçersiz index"}), 400
+
+@app.route('/tasks/<int:index>', methods=['PUT'])
+def update_task(index):
+    if 0 <= index < len(tasks):
+        data = request.get_json()
+        tasks[index].update(data)
+        return jsonify(tasks[index]), 200
+    return jsonify({"error": "Geçersiz index"}), 400
+
 @app.route('/tasks', methods=['POST'])
 def add_task():
     data = request.get_json()
