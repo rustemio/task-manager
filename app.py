@@ -27,6 +27,7 @@ def add_task():
 @app.route('/tasks/<int:index>', methods=['DELETE'])
 def delete_task(index):
     if 0 <= index < len(tasks):
+        print(f"DELETE /tasks/{index}, mevcut uzunluk: {len(tasks)}")
         tasks.pop(index)
         return jsonify({"message": "Silindi"}), 200
     return jsonify({"error": "Geçersiz index"}), 400

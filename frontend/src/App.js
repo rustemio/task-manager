@@ -1,8 +1,9 @@
-// src/App.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+
+const BASE_URL = "https://gorev-backend-rustemio.azurewebsites.net";
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -12,30 +13,39 @@ function App() {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTime(new Date());
-    }, 1000);
-    return () => clearInterval(interval);
+    axios.get(`${BASE_URL}/tasks`)
+      .then(res => setTasks(res.data))
+      .catch(err => console.error("Görevleri çekerken hata:", err));
   }, []);
 
   const addTask = () => {
     if (title.trim() === "") return;
     const newTask = { title, category, completed: false };
-    setTasks([...tasks, newTask]);
-    setTitle("");
-    axios.post("http://localhost:5001/tasks", newTask).catch(err => console.error(err));
+
+    axios.post(`${BASE_URL}/tasks`, newTask)
+      .then(() => {
+        setTasks([...tasks, newTask]);
+        setTitle("");
+      })
+      .catch(err => console.error("Görev eklenemedi:", err));
   };
 
   const deleteTask = (index) => {
-    const updated = [...tasks];
-    updated.splice(index, 1);
-    setTasks(updated);
+    console.log("Удаляется:", index); // для проверки
+
+    axios.delete(`${BASE_URL}/tasks/${index}`)
+      .then(() => {
+        const updatedTasks = [...tasks];
+        updatedTasks.splice(index, 1);
+        setTasks(updatedTasks);
+      })
+      .catch(err => console.error("Silme hatası:", err));
   };
 
   const toggleTask = (index) => {
-    const updated = [...tasks];
-    updated[index].completed = !updated[index].completed;
-    setTasks(updated);
+    const updatedTasks = [...tasks];
+    updatedTasks[index].completed = !updatedTasks[index].completed;
+    setTasks(updatedTasks);
   };
 
   const exportPDF = () => {
@@ -160,7 +170,7 @@ function App() {
           </div>
         </div>
 
-        <h2>📝 Görev Yönetim Uygulaması</h2>
+        <h2>📝 Görev Yönetim</h2>
 
         <div style={styles.form}>
           <input
