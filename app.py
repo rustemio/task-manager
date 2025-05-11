@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request # type: ignore
 from flask_cors import CORS # type: ignore
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 tasks = []
 
